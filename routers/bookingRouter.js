@@ -3,14 +3,12 @@ const router = express.Router();
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-
 router.get("/v1/all", async (req, res) => {
   try {
-    let userId = req?.headers?.user?.id;
-    if (!userId) {
-      return res.status(400).send({ error: "User ID is missing from headers" });
-    }
+    console.log("Headers:", req.headers);
+    let userId = req.headers.user.id;
     userId = parseInt(userId);
+    console.log("User ID:", userId);
     const bookings = await prisma.book.findMany({
       where: {
         userId: userId,
@@ -21,10 +19,10 @@ router.get("/v1/all", async (req, res) => {
     });
     res.status(200).send(bookings);
   } catch (error) {
+    console.error("Error fetching bookings:", error);
     res.status(500).send(error);
   }
 });
-
 router.post("/v1/create", async (req, res) => {
   try {
     let userId = req?.headers?.user?.id;
