@@ -9,6 +9,7 @@ const filesRouter = require("./routers/filesRouter");
 const drugsRouter = require("./routers/drugsRouter");
 const visitRouter = require("./routers/visitRouter");
 const bookingRouter = require("./routers/bookingRouter");
+const invoiceRouter = require("./routers/invoiceRouter");
 const checkAuth = require("./middleware");
 
 app.use(express.json());
@@ -29,6 +30,7 @@ app.use("/api/visit", checkAuth, visitRouter);
 app.use("/api/file", checkAuth, filesRouter);
 app.use("/api/drug", checkAuth, drugsRouter);
 app.use("/api/booking", checkAuth, bookingRouter);
+app.use("/api/invoice", checkAuth, invoiceRouter);
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
