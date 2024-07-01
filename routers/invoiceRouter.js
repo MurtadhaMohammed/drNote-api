@@ -7,18 +7,21 @@ router.get("/v1/all", async (req, res) => {
   try {
     const take = parseInt(req.query.take) || 20;
     const skip = parseInt(req.query.skip) || 0;
-
+    const userId = parseInt(req.headers.user.id);
     const invoices = await prisma.invoice.findMany({
       skip,
       take,
       orderBy: {
         id: "desc",
       },
+      where: {
+        patient: {
+          userId: userId,
+        },},
       include: {
-        patient: true, // Include patient information
+        patient: true, 
       },
     });
-
     res.status(200).json(invoices);
   } catch (error) {
     console.error(error);
@@ -34,7 +37,7 @@ router.get("/v1/find/:id", async (req, res) => {
         id: parseInt(id),
       },
       include: {
-        patient: true, // Include patient information
+        patient: true, 
       },
     });
     if (!invoice) {
@@ -59,7 +62,7 @@ router.post("/v1/create", async (req, res) => {
         patientId: parseInt(patientId),
       },
       include: {
-        patient: true, // Include patient information
+        patient: true, 
       },
     });
     res.status(200).json(newInvoice);
@@ -84,7 +87,7 @@ router.put("/v1/edit/:id", async (req, res) => {
         patientId: parseInt(patientId),
       },
       include: {
-        patient: true, // Include patient information
+        patient: true, 
       },
     });
     res.status(200).json(updatedInvoice);
@@ -102,7 +105,7 @@ router.delete("/v1/delete/:id", async (req, res) => {
         id: parseInt(id),
       },
       include: {
-        patient: true, // Include patient information
+        patient: true, 
       },
     });
     res.status(200).json(deletedInvoice);
