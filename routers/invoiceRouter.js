@@ -16,7 +16,7 @@ router.get("/v1/all", async (req, res) => {
       },
       where: {
         patient: {
-          userId: userId,
+          userId: parseInt(userId),
         },
       },
       include: {
