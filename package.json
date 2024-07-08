@@ -20,6 +20,6 @@
     "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
-    "prisma": "^5.9.1"
+    "prisma": "^5.16.1"
   }
 }

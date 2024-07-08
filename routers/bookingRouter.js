@@ -6,7 +6,6 @@ const prisma = new PrismaClient();
 router.get("/v1/all", async (req, res) => {
   try {
     let userId = req.headers.user.id;
-    console.log("userId", userId);
     const bookings = await prisma.book.findMany({
       where: {
         userId: userId,

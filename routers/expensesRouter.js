@@ -7,16 +7,15 @@ router.get("/v1/all", async (req, res) => {
   try {
     const take = parseInt(req.query.take) || 20;
     const skip = parseInt(req.query.skip) || 0;
-    const userId = req.headers.user.id;
     const q = req.query.q || undefined;
-    const range = req.query.range || "3";
-    let dateFilter = {};
+    const range = req.query.range || "1";
 
+    let dateFilter = {};
     const now = new Date();
     switch (range) {
-      case "3":
+      case "1":
         dateFilter = {
-          createdAt: {
+          date: {
             gte: new Date(now.getFullYear(), now.getMonth(), now.getDate()),
             lte: now,
           },
@@ -26,125 +25,111 @@ router.get("/v1/all", async (req, res) => {
         const lastWeek = new Date();
         lastWeek.setDate(lastWeek.getDate() - 7);
         dateFilter = {
-          createdAt: {
+          date: {
             gte: lastWeek,
             lte: now,
           },
         };
         break;
-      case "1":
+      case "3":
       default:
         dateFilter = {};
         break;
     }
 
-    const invoices = await prisma.invoice.findMany({
+    const expenses = await prisma.expense.findMany({
       skip,
       take,
       orderBy: {
         id: "desc",
       },
       where: {
-        patient: {
-          userId: userId,
+        name: {
+          contains: q,
+          mode: "insensitive",
         },
         ...dateFilter,
       },
-      include: {
-        patient: true,
-      },
     });
 
-    res.status(200).json(invoices);
+    res.status(200).json(expenses);
   } catch (error) {
     console.error(error);
-    res.status(500).send("Failed to fetch invoices.");
+    res.status(500).send("Failed to fetch expenses.");
   }
 });
 
 router.get("/v1/find/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const invoice = await prisma.invoice.findUnique({
+    const expense = await prisma.expense.findUnique({
       where: {
         id: parseInt(id),
       },
-      include: {
-        patient: true,
-      },
     });
-    if (!invoice) {
-      res.status(404).send("Invoice not found.");
+    if (!expense) {
+      res.status(404).send("Expense not found.");
       return;
     }
-    res.status(200).json(invoice);
+    res.status(200).json(expense);
   } catch (error) {
-    console.error("Error fetching invoice:", error);
-    res.status(500).send("Failed to fetch invoice.");
+    console.error("Error fetching expense:", error);
+    res.status(500).send("Failed to fetch expense.");
   }
 });
 
 router.post("/v1/create", async (req, res) => {
   try {
-    const { amount, service, note, patientId } = req.body;
-    const newInvoice = await prisma.invoice.create({
+    const { name, amount, note, date } = req.body;
+    const newExpense = await prisma.expense.create({
       data: {
+        name,
         amount: parseFloat(amount),
-        service,
         note,
-        patientId: parseInt(patientId),
-      },
-      include: {
-        patient: true,
+        date,
       },
     });
-    res.status(200).json(newInvoice);
+    res.status(200).json(newExpense);
   } catch (error) {
-    console.error("Error creating invoice:", error);
-    res.status(500).send("Failed to create invoice.");
+    console.error("Error creating expense:", error);
+    res.status(500).send("Failed to create expense.");
   }
 });
 
 router.put("/v1/edit/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { amount, service, note, patientId } = req.body;
-    const updatedInvoice = await prisma.invoice.update({
+    const { name, amount, note, date } = req.body;
+    const updatedExpense = await prisma.expense.update({
       where: {
         id: parseInt(id),
       },
       data: {
+        name,
         amount: parseFloat(amount),
-        service,
         note,
-        patientId: parseInt(patientId),
-      },
-      include: {
-        patient: true,
+        date,
       },
     });
-    res.status(200).json(updatedInvoice);
+    res.status(200).json(updatedExpense);
   } catch (error) {
-    console.error("Error updating invoice:", error);
-    res.status(500).send("Failed to update invoice.");
+    console.error("Error updating expense:", error);
+    res.status(500).send("Failed to update expense.");
   }
 });
 
 router.delete("/v1/delete/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const deletedInvoice = await prisma.invoice.delete({
+    const deletedExpense = await prisma.expense.delete({
       where: {
         id: parseInt(id),
       },
-      include: {
-        patient: true,
-      },
     });
-    res.status(200).json(deletedInvoice);
+    res.status(200).json(deletedExpense);
   } catch (error) {
-    console.error("Error deleting invoice:", error);
-    res.status(500).send("Failed to delete invoice.");
+    console.error("Error deleting expense:", error);
+    res.status(500).send("Failed to delete expense.");
   }
 });
 
