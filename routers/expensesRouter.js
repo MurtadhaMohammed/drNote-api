@@ -13,17 +13,17 @@ router.get("/v1/all", async (req, res) => {
     let dateFilter = {};
     const now = new Date();
     switch (range) {
-      case "1":
+      case "1": // This Day
         dateFilter = {
           date: {
-            gte: new Date(now.getFullYear(), now.getMonth(), now.getDate()),
-            lte: now,
+            gte: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0),
+            lte: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59),
           },
         };
         break;
-      case "2":
+      case "2": // Last Week
         const lastWeek = new Date();
-        lastWeek.setDate(lastWeek.getDate() - 7);
+        lastWeek.setDate(now.getDate() - 7);
         dateFilter = {
           date: {
             gte: lastWeek,
@@ -31,7 +31,7 @@ router.get("/v1/all", async (req, res) => {
           },
         };
         break;
-      case "3":
+      case "3": // All Time
       default:
         dateFilter = {};
         break;
