@@ -44,14 +44,20 @@ router.get("/v1/all", async (req, res) => {
       orderBy: {
         id: "desc",
       },
+      include: {
+        patient: true,
+      },
       where: {
         patient: {
           userId: userId,
         },
+        ...(q && {
+          OR: [
+            { service: { contains: q, mode: "insensitive" } },
+            { note: { contains: q, mode: "insensitive" } },
+          ],
+        }),
         ...dateFilter,
-      },
-      include: {
-        patient: true,
       },
     });
 

@@ -8,32 +8,6 @@ router.get("/v1/all", async (req, res) => {
     const take = parseInt(req.query.take) || 20;
     const skip = parseInt(req.query.skip) || 0;
     const q = req.query.q || undefined;
-    let dateFilter = {};
-    const now = new Date();
-    switch (range) {
-      case "1": // This Day
-        dateFilter = {
-          date: {
-            gte: new Date( now.getDate(),0,0,0),
-            lte: new Date( now.getDate(), 23, 59, 59),
-          },
-        };
-        break;
-      case "2": // Last Week
-        const lastWeek = new Date();
-        lastWeek.setDate(now.getDate() - 7);
-        dateFilter = {
-          date: {
-            gte: lastWeek,
-            lte: now,
-          },
-        };
-        break;
-      case "3": // All Time
-      default:
-        dateFilter = {};
-        break;
-    }
     const patients = await prisma.patient.findMany({
       where: {
         userId: req?.headers?.user?.id || undefined,
