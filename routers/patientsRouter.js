@@ -13,7 +13,7 @@ router.get("/v1/all", async (req, res) => {
     const now = new Date();
 
     switch (range) {
-      case "3":
+      case "1":
         dateFilter = {
           createdAt: {
             gte: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0),
@@ -31,7 +31,7 @@ router.get("/v1/all", async (req, res) => {
           },
         };
         break;
-      case "1":
+      case "3":
       default:
         dateFilter = {};
         break;

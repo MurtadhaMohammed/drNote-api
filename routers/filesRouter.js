@@ -18,6 +18,34 @@ router.get("/v1/all", async (req, res) => {
     const take = parseInt(req.query.take) || 20;
     const skip = parseInt(req.query.skip) || 0;
     const q = req.query.q || undefined;
+    const range = req.query.range || "3";
+    let dateFilter = {};
+
+    const now = new Date();
+    switch (range) {
+      case "1":
+        dateFilter = {
+          createdAt: {
+            gte: new Date(now.getFullYear(), now.getMonth(), now.getDate()),
+            lte: now,
+          },
+        };
+        break;
+      case "2":
+        const lastWeek = new Date();
+        lastWeek.setDate(lastWeek.getDate() - 7);
+        dateFilter = {
+          createdAt: {
+            gte: lastWeek,
+            lte: now,
+          },
+        };
+        break;
+      case "3":
+      default:
+        dateFilter = {};
+        break;
+    }
     const files = await prisma.file.findMany({
       where: {
         patient: {
@@ -28,6 +56,7 @@ router.get("/v1/all", async (req, res) => {
             mode: "insensitive",
           },
         },
+        ...dateFilter,
       },
       skip,
       take,
