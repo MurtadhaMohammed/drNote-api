@@ -98,7 +98,9 @@ router.post("/v1/create", async (req, res) => {
         amount: parseFloat(amount),
         service,
         note,
-        patientId: parseInt(patientId),
+        patient: {
+          connect: { id: parseInt(patientId) },
+        },
       },
       include: {
         patient: true,
