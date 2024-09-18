@@ -92,14 +92,16 @@ router.get("/v1/find/:id", async (req, res) => {
 
 router.post("/v1/create", async (req, res) => {
   try {
-    const { amount, service, note, patientId } = req.body;
+    const { amount, service, note, patient } = req.body;
     const newInvoice = await prisma.invoice.create({
       data: {
         amount: parseFloat(amount),
         service,
         note,
         patient: {
-          connect: { id: parseInt(patientId) },
+          create: {
+            ...patient
+          }
         },
       },
       include: {
