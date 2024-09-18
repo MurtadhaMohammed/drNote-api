@@ -6,13 +6,22 @@ const prisma = new PrismaClient();
 router.get("/v1/all", async (req, res) => {
   try {
     let userId = req.headers.user.id;
+    const q = req.query.q || undefined;
+
     const bookings = await prisma.book.findMany({
       where: {
         userId: userId,
+        patient: {
+          name: {
+            contains: q,
+            mode: "insensitive",
+          },
+        },
       },
       include: {
         patient: true,
       },
+
     });
     res.status(200).send(bookings);
   } catch (error) {
