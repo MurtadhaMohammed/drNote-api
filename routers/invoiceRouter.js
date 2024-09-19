@@ -100,7 +100,7 @@ router.post("/v1/create", async (req, res) => {
         note,
         patient: {
           create: {
-            ...patient
+            ...patient,
           }
         },
       },
@@ -118,16 +118,17 @@ router.post("/v1/create", async (req, res) => {
 router.put("/v1/edit/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { amount, service, note, patientId } = req.body;
+    const { amount, service, note, patient } = req.body;
+
     const updatedInvoice = await prisma.invoice.update({
       where: {
-        id: parseInt(id),
+        patientId: parseInt(id),
       },
       data: {
         amount: parseFloat(amount),
         service,
         note,
-        patientId: parseInt(patientId),
+        patient,
       },
       include: {
         patient: true,
