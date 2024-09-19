@@ -17,7 +17,7 @@ router.get("/v1/all", async (req, res) => {
         dateFilter = {
           date: {
             gte: new Date(now.getFullYear(), now.getMonth(), now.getDate()),
-            lte: now,
+            lte: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59),
           },
         };
         break;
