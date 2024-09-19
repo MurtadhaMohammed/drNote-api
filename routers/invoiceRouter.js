@@ -121,14 +121,21 @@ router.put("/v1/edit/:id", async (req, res) => {
     const { amount, service, note, patient } = req.body;
 
     const updatedInvoice = await prisma.invoice.update({
-      where: {
-        patientId: parseInt(id),
-      },
+      where: { id: parseInt(id) },
       data: {
         amount: parseFloat(amount),
-        service,
-        note,
-        patient,
+        service: service,
+        note: note,
+        patient: {
+          update: {
+            name: patient.name,
+            phone: patient.phone,
+            birthDate: patient.birthDate,
+            gender: patient.gender,
+            address: patient.address,
+            active: patient.active,
+          },
+        },
       },
       include: {
         patient: true,
