@@ -28,7 +28,7 @@ app.get("/", (req, res) => {
 app.use("/api/user", userRouter);
 app.use("/api/patient", checkAuth, patientsRouter);
 app.use("/api/visit", checkAuth, visitRouter);
-app.use("/api/file", filesRouter);
+app.use("/api/file", checkAuth, filesRouter);
 app.use("/api/drug", checkAuth, drugsRouter);
 app.use("/api/booking", checkAuth, bookingRouter);
 app.use("/api/invoice", checkAuth, invoiceRouter);
