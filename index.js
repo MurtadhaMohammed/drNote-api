@@ -13,13 +13,13 @@ const invoiceRouter = require("./routers/invoiceRouter");
 const expensesRouter = require("./routers/expensesRouter");
 const checkAuth = require("./middleware");
 
-app.use(express.json());
-app.use(cors());
 app.use(
   fileUpload({
     limits: { fileSize: 50 * 1024 * 1024 },
   })
 );
+app.use(express.json());
+app.use(cors());
 
 app.get("/", (req, res) => {
   res.send("Server is live");
@@ -28,7 +28,7 @@ app.get("/", (req, res) => {
 app.use("/api/user", userRouter);
 app.use("/api/patient", checkAuth, patientsRouter);
 app.use("/api/visit", checkAuth, visitRouter);
-app.use("/api/file", checkAuth, filesRouter);
+app.use("/api/file", filesRouter);
 app.use("/api/drug", checkAuth, drugsRouter);
 app.use("/api/booking", checkAuth, bookingRouter);
 app.use("/api/invoice", checkAuth, invoiceRouter);
