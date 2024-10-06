@@ -3,6 +3,7 @@ const router = express.Router();
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const { S3Client, PutObjectCommand, DeleteObjectCommand, ListObjectsV2Command, GetObjectCommand } = require("@aws-sdk/client-s3");
+const { v4 } = require('uuid');
 
 const s3Client = new S3Client({
   region: "us-east-1",
@@ -82,15 +83,16 @@ router.post("/v1/create", async function (req, res) {
     const { patientId } = req.body;
     const file = req.files.file;
 
-    const result = await uploadToLinode(file.data, file?.name, 'drnote');
+    const uniqueId = v4();
+    const fileName = `${uniqueId}_${file?.name}`;
 
-    console.log(result, 'res');
+    const result = await uploadToLinode(file.data, fileName, file?.ContentType, 'drnote');
 
     const fileS = await prisma.file.create({
       data: {
         userId: parseInt(req?.headers?.user?.id),
         patientId: parseInt(patientId),
-        name: result,
+        name: fileName,
       },
     });
     res.status(200).send(fileS);
@@ -99,7 +101,7 @@ router.post("/v1/create", async function (req, res) {
   }
 });
 
-const uploadToLinode = async (fileBuffer, fileName, bucketName) => {
+const uploadToLinode = async (fileBuffer, fileName, ContentType, bucketName) => {
   if (!fileBuffer) {
     throw new Error("No file was uploaded.");
   }
@@ -109,7 +111,7 @@ const uploadToLinode = async (fileBuffer, fileName, bucketName) => {
       Bucket: bucketName,
       Key: objectName,
       Body: fileBuffer,
-      ContentType: "image/webp",
+      ContentType,
       ACL: "public-read",
     });
 
@@ -135,8 +137,6 @@ router.get('/v1/image/:key', async (req, res) => {
 
     const response = await s3Client.send(command);
 
-    console.log(response);
-
     res.set('Content-Type', response.ContentType);
     response.Body.pipe(res);
   } catch (error) {
@@ -154,12 +154,12 @@ router.delete("/v1/delete/:id", async function (req, res) {
       },
     });
 
-    const result = await deleteFile(
-      {
-        uuid: file?.name,
-      },
-      { authSchema: uploadcareSimpleAuthSchema }
-    );
+    const deleteParams = {
+      Bucket: 'drnote',
+      Key: file.name,
+    };
+
+    const result = await DeleteObjectCommand(deleteParams);
 
     res.status(200).send(result);
   } catch (error) {
