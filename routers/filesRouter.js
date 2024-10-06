@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const { S3Client, PutObjectCommand, DeleteObjectCommand, ListObjectsV2Command } = require("@aws-sdk/client-s3");
+
 const { uploadFile } = require("@uploadcare/upload-client");
 const {
   deleteFile,
@@ -12,6 +14,18 @@ const uploadcareSimpleAuthSchema = new UploadcareSimpleAuthSchema({
   publicKey: process.env.PUBLICKEY,
   secretKey: "a3148c26b4f95c3c577b",
 });
+
+
+const s3Client = new S3Client({
+  region: "us-east-1",
+  credentials: {
+    accessKeyId: "EIY10XXI3SVFYW5QEF4D",
+    secretAccessKey: "4VprTapVdABKFsPf8re8dUEdRiA0jyKGrEERE6JT",
+  },
+  endpoint: "https://drlab.us-east-1.linodeobjects.com",
+  forcePathStyle: true,
+});
+
 
 router.get("/v1/all", async (req, res) => {
   try {
@@ -75,17 +89,25 @@ router.get("/v1/all", async (req, res) => {
 });
 
 router.post("/v1/create", async function (req, res) {
-  //save on server (uplaodcare.com)
+  const { patientId } = req.body;
+  const file = req.file?.file?.data;
+
+  if (!file) {
+    res.status(500).send('no file detected');
+  }
+
   try {
-    const { patientId } = req.body;
-    const result = await uploadFile(req.files.file.data, {
-      publicKey: process.env.PUBLICKEY,
-      store: "auto",
-      metadata: {
-        subsystem: "uploader",
-        pet: "cat",
-      },
-    });
+    const uniqueFileName = req.files.file.name;
+
+    const uploadParams = {
+      Bucket: "drnote",
+      Key: uniqueFileName,
+      Body: file,
+      ACL: "public-read",
+    };
+
+    const result = await s3Client.send(new PutObjectCommand(uploadParams));
+
     const file = await prisma.file.create({
       data: {
         userId: parseInt(req?.headers?.user?.id),
