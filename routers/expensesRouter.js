@@ -5,6 +5,7 @@ const prisma = new PrismaClient();
 
 router.get("/v1/all", async (req, res) => {
   try {
+    const id = req?.headers?.user?.id;
     const take = parseInt(req.query.take) || 20;
     const skip = parseInt(req.query.skip) || 0;
     const q = req.query.q || undefined;
@@ -17,7 +18,14 @@ router.get("/v1/all", async (req, res) => {
         dateFilter = {
           date: {
             gte: new Date(now.getFullYear(), now.getMonth(), now.getDate()),
-            lte: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59),
+            lte: new Date(
+              now.getFullYear(),
+              now.getMonth(),
+              now.getDate(),
+              23,
+              59,
+              59,
+            ),
           },
         };
         break;
@@ -44,6 +52,7 @@ router.get("/v1/all", async (req, res) => {
         id: "desc",
       },
       where: {
+        userId: id,
         name: {
           contains: q,
           mode: "insensitive",
@@ -80,6 +89,7 @@ router.get("/v1/find/:id", async (req, res) => {
 
 router.post("/v1/create", async (req, res) => {
   try {
+    const id = parseInt(req?.headers?.user?.id);
     const { name, amount, note, date } = req.body;
     const newExpense = await prisma.expense.create({
       data: {
@@ -87,6 +97,7 @@ router.post("/v1/create", async (req, res) => {
         amount: parseFloat(amount),
         note,
         date,
+        userId: id,
       },
     });
     res.status(200).json(newExpense);

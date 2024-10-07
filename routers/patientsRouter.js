@@ -16,8 +16,22 @@ router.get("/v1/all", async (req, res) => {
       case "1":
         dateFilter = {
           createdAt: {
-            gte: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0),
-            lte: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59),
+            gte: new Date(
+              now.getFullYear(),
+              now.getMonth(),
+              now.getDate(),
+              0,
+              0,
+              0,
+            ),
+            lte: new Date(
+              now.getFullYear(),
+              now.getMonth(),
+              now.getDate(),
+              23,
+              59,
+              59,
+            ),
           },
         };
         break;

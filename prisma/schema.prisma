@@ -25,6 +25,7 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   Book          Book[]
+  expense       Expense[]
 }
 
 model Patient {
@@ -39,9 +40,9 @@ model Patient {
   files     File[]
   visits    Visit[]
   invoices  Invoice[]
-  active    Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   Book      Book[]
 }
 
@@ -115,7 +116,9 @@ model Expense {
   name      String?
   amount    Float
   note      String?
-  date      DateTime 
+  date      DateTime
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
 }
