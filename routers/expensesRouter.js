@@ -24,7 +24,7 @@ router.get("/v1/all", async (req, res) => {
               now.getDate(),
               23,
               59,
-              59,
+              59
             ),
           },
         };
@@ -91,6 +91,11 @@ router.post("/v1/create", async (req, res) => {
   try {
     const id = parseInt(req?.headers?.user?.id);
     const { name, amount, note, date } = req.body;
+    const userId = parseInt(req?.headers?.user?.id);
+    if (!userId) {
+      return res.status(400).send("Invalid user ID.");
+    }
+
     const newExpense = await prisma.expense.create({
       data: {
         name,

@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -18,14 +15,14 @@ model User {
   shortCode     String?
   shortCodeInit DateTime  @default(now())
   active        Boolean   @default(true)
-  patinets      Patient[]
-  files         File[]
-  visits        Visit[]
-  drugs         Drug[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   Book          Book[]
-  expense       Expense[]
+  drugs         Drug[]
+  files         File[]
+  patinets      Patient[]
+  visits        Visit[]
+  expenses      Expense[]
 }
 
 model Patient {
@@ -35,26 +32,26 @@ model Patient {
   birthDate String?
   gender    String    @default("male")
   address   String?
-  user      User      @relation(fields: [userId], references: [id])
   userId    Int
-  files     File[]
-  visits    Visit[]
-  invoices  Invoice[]
   active    Boolean   @default(true)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   Book      Book[]
+  files     File[]
+  invoices  Invoice[]
+  user      User      @relation(fields: [userId], references: [id])
+  visits    Visit[]
 }
 
 model File {
   id        Int      @id @default(autoincrement())
   name      String   @unique
-  patient   Patient? @relation(fields: [patientId], references: [id])
   patientId Int?
-  user      User?    @relation(fields: [userId], references: [id])
   userId    Int?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  patient   Patient? @relation(fields: [patientId], references: [id])
+  user      User?    @relation(fields: [userId], references: [id])
 }
 
 model Visit {
@@ -63,10 +60,10 @@ model Visit {
   drugs     Json[]   @default([])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  patient   Patient? @relation(fields: [patientId], references: [id])
   patientId Int?
-  user      User?    @relation(fields: [userId], references: [id])
   userId    Int?
+  patient   Patient? @relation(fields: [patientId], references: [id])
+  user      User?    @relation(fields: [userId], references: [id])
 }
 
 model Drug {
@@ -75,8 +72,8 @@ model Drug {
   color     String   @default("#EEEEEE")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  user      User?    @relation(fields: [userId], references: [id])
   userId    Int?
+  user      User?    @relation(fields: [userId], references: [id])
 }
 
 model DrugStore {
@@ -88,9 +85,7 @@ model DrugStore {
 
 model Book {
   id        Int        @id @default(autoincrement())
-  user      User       @relation(fields: [userId], references: [id])
   userId    Int
-  patient   Patient?   @relation(fields: [patientId], references: [id])
   patientId Int
   number    Int?
   date      DateTime
@@ -98,6 +93,8 @@ model Book {
   status    BookStatus @default(PENDING)
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
+  patient   Patient    @relation(fields: [patientId], references: [id])
+  user      User       @relation(fields: [userId], references: [id])
 }
 
 model Invoice {
@@ -105,10 +102,10 @@ model Invoice {
   amount    Float
   service   String
   note      String?
-  patient   Patient  @relation(fields: [patientId], references: [id])
   patientId Int
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
+  patient   Patient  @relation(fields: [patientId], references: [id])
 }
 
 model Expense {
@@ -116,9 +113,9 @@ model Expense {
   name      String?
   amount    Float
   note      String?
-  date      DateTime
-  user      User     @relation(fields: [userId], references: [id])
   userId    Int
+  user      User      @relation(fields: [userId], references: [id])
+  date      DateTime
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
 }
