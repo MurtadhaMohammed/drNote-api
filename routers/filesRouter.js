@@ -10,7 +10,7 @@ const s3Client = new S3Client({
   logger: console,
   credentials: {
     accessKeyId: "EIY10XXI3SVFYW5QEF4D",
-    secretAccessKey: "4VprTapVdABKFsPf8re8dUEdRiA0jyKGrEERE6JT",
+    secretAccessKey: process.env.SECRET_KEY,
   },
   endpoint: "https://drlab.us-east-1.linodeobjects.com",
   forcePathStyle: true,
@@ -83,8 +83,8 @@ router.post("/v1/create", async function (req, res) {
     const { patientId } = req.body;
     const file = req.files.file;
 
-    const uniqueId = v4();
-    const fileName = `${uniqueId}_${file?.name}`;
+    // const uniqueId = v4();
+    const fileName = `${file?.name}`;
 
     const result = await uploadToLinode(file.data, fileName, file?.ContentType, 'drnote');
 
@@ -118,7 +118,7 @@ const uploadToLinode = async (fileBuffer, fileName, ContentType, bucketName) => 
     await s3Client.send(command);
 
     const fileUrl = objectName;
-    console.log(`File uploaded successfully: ${fileUrl}`);
+    // console.log(`File uploaded successfully: ${fileUrl}`);
     return fileUrl;
   } catch (error) {
     console.error("File upload failed:", error);
